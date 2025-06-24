@@ -8,16 +8,18 @@ const server = http.createServer(app);
 
 // CORS config — ✅ good
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'https://codelive-eadg.onrender.com',
   methods: ['GET', 'POST']
 }));
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST']
+    origin: 'https://codelive-eadg.onrender.com',
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
+
 
 io.on('connection', (socket) => {
   console.log('🔌 A user connected:', socket.id);
