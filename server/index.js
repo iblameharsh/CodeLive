@@ -49,6 +49,12 @@ io.on('connection', (socket) => {
   });
 });
 
+  socket.on('leave', (roomId) => {
+  socket.leave(roomId);
+  console.log(`👋 ${socket.id} left room: ${roomId}`);
+});
+
+
 
 app.get('/', (req, res) => {
   res.send('✅ CodeLens server is running');
