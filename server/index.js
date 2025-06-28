@@ -20,6 +20,8 @@ const io = new Server(server, {
   }
 });
 
+// Store code+language per room
+const roomState = {};
 
 io.on('connection', (socket) => {
   console.log('🔌 A user connected:', socket.id);
@@ -28,19 +30,28 @@ io.on('connection', (socket) => {
   socket.on('join', (roomId) => {
     socket.join(roomId);
     console.log(`📥 ${socket.id} joined room: ${roomId}`);
+
+    if (roomState[roomId]) {
+      socket.emit('code-change', roomState[roomId]);
+    }
   });
 
 
   socket.on('code-change', ({ roomId, code, language }) => {
-   
+    roomState[roomId] = { code, language };
     socket.to(roomId).emit('code-change', { code, language });
   });
 
   
   socket.on('disconnecting', () => {
     const rooms = Array.from(socket.rooms).filter(r => r !== socket.id);
-    rooms.forEach(room => {
-      console.log(`👋 ${socket.id} is leaving room: ${room}`);
+    rooms.forEach(roomId => {
+      const room = io.sockets.adapter.rooms.get(roomId);
+      if (!room || room.size <= 1) {
+        delete roomState[roomId]; // 🧹 Clean up room state
+        console.log(`🧹 Room ${roomId} cleaned up`);
+      }
+      console.log(`👋 ${socket.id} is leaving room: ${roomId}`);
     });
   });
 
@@ -49,8 +60,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('leave', (roomId) => {
-  socket.leave(roomId);
-  console.log(`👋 ${socket.id} left room: ${roomId}`);
+    socket.leave(roomId);
+    console.log(`👋 ${socket.id} left room: ${roomId}`);
   });
 });
 
