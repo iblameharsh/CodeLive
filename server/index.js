@@ -47,11 +47,11 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('❌ A user disconnected:', socket.id);
   });
-});
 
   socket.on('leave', (roomId) => {
   socket.leave(roomId);
   console.log(`👋 ${socket.id} left room: ${roomId}`);
+  });
 });
 
 
